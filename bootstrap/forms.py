@@ -29,6 +29,11 @@ class BootstrapMixin(object):
         else:
             self.help_style = "block"
 
+        if hasattr(self, 'Meta') and hasattr(self.Meta, 'help_tooltip'):
+            self.help_tooltip = True
+        else:
+            self.help_tooltip = False
+
     # For backward compatibility
     __bootstrap__ = __init__
 
@@ -117,8 +122,11 @@ class BootstrapMixin(object):
                 css_class += " required"
 
             if field_instance.help_text:
-                # The field has a help_text, construct <span> tag
-                help_text = '<span class="help-%s">%s</span>' % (self.help_style, force_unicode(field_instance.help_text))
+                if self.help_tooltip:
+                    help_text = force_unicode(field_instance.help_text)
+                else:
+                    # The field has a help_text, construct <span> tag
+                    help_text = '<span class="help-%s">%s</span>' % (self.help_style, force_unicode(field_instance.help_text))
             else:
                 help_text = u''
 
@@ -126,6 +134,7 @@ class BootstrapMixin(object):
                 'class' : mark_safe(css_class),
                 'label' : mark_safe(bf.label or ''),
                 'help_text' :mark_safe(help_text),
+                'help_tooltip': self.help_tooltip,
                 'field' : field_instance,
                 'bf' : mark_safe(unicode(bf)),
                 'bf_raw' : bf,
